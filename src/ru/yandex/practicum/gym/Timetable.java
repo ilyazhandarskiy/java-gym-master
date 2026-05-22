@@ -31,28 +31,23 @@ public class Timetable {
         timeTrainings.add(trainingSession); // добавляем тренировку
     }
 
-    public List<TrainingSession> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
+    //выбираю SortedMap чтобы возвращать иммутабельную мапу
+    public SortedMap<TimeOfDay, Set<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
         //как реализовать, тоже непонятно, но сложность должна быть О(1)
-        if (!timetable.containsKey(dayOfWeek)) {
-            return new ArrayList<>();
+        TreeMap<TimeOfDay, Set<TrainingSession>> daySchedule = timetable.get(dayOfWeek);
+        if (daySchedule == null) {
+            return Collections.emptySortedMap();
         }
-
-        TreeMap<TimeOfDay, Set<TrainingSession>> dayTimetable = timetable.get(dayOfWeek);
-
-        List<TrainingSession> trainingSessions = new ArrayList<>();
-        for (TimeOfDay timeOfDay : dayTimetable.navigableKeySet()) {
-            trainingSessions.addAll(dayTimetable.get(timeOfDay));
-        }
-
-        return trainingSessions;
+        return Collections.unmodifiableSortedMap(daySchedule);
     }
 
     public Set<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
         //как реализовать, тоже непонятно, но сложность должна быть О(1)
-        if (!timetable.containsKey(dayOfWeek) || !timetable.get(dayOfWeek).containsKey(timeOfDay)) {
-            return new TreeSet<>();
+        TreeMap<TimeOfDay, Set<TrainingSession>> daySchedule = timetable.get(dayOfWeek);
+        if (daySchedule == null) {
+            return Collections.emptySet();
         }
-        return timetable.get(dayOfWeek).get(timeOfDay);
+        return Collections.unmodifiableSet(daySchedule.getOrDefault(timeOfDay, Collections.emptySet()));
     }
 
     public List<CounterOfTrainings> getCountByCoaches() {
